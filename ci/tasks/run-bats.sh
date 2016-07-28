@@ -29,7 +29,7 @@ DIRECTOR=$(azure network public-ip show ${AZURE_GROUP_NAME} AzureCPICI-bosh --js
 CF_IP_ADDRESS=$(azure network public-ip show ${AZURE_GROUP_NAME} AzureCPICI-cf-bats --json | jq '.ipAddress' -r)
 
 source /etc/profile.d/chruby.sh
-chruby 2.1.2
+chruby 2.2.4
 
 echo "DirectorIP =" $DIRECTOR
 

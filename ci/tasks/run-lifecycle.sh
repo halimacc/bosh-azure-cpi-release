@@ -44,7 +44,7 @@ tar -xf /mnt/image -C /mnt/
 azure storage blob upload --quiet --blobtype PAGE /mnt/root.vhd stemcell ${BOSH_AZURE_STEMCELL_ID}.vhd
 
 source /etc/profile.d/chruby.sh
-chruby 2.1.2
+chruby 2.2.4
 
 pushd bosh-cpi-release/src/bosh_azure_cpi
   bundle install
