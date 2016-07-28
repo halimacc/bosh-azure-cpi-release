@@ -7,8 +7,6 @@ chruby 2.1.2
 
 semver=`cat version-semver/number`
 
-mkdir out
-
 cd bosh-cpi-release
 
 echo "running unit tests"
