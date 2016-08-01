@@ -36,7 +36,7 @@ export BOSH_AZURE_PRIMARY_PUBLIC_IP=$(azure network public-ip show ${AZURE_GROUP
 export BOSH_AZURE_SECONDARY_PUBLIC_IP=$(azure network public-ip show ${AZURE_GROUP_NAME_FOR_NETWORK} AzureCPICI-cf-lifecycle --json | jq '.ipAddress' -r)
 
 export AZURE_STORAGE_ACCOUNT=${AZURE_STORAGE_ACCOUNT_NAME}
-export AZURE_STORAGE_ACCESS_KEY=$(azure storage account keys list ${AZURE_STORAGE_ACCOUNT_NAME} -g ${AZURE_GROUP_NAME_FOR_VMS} --json | jq '.storageAccountKeys.key1' -r)
+export AZURE_STORAGE_ACCESS_KEY=$(azure storage account keys list ${AZURE_STORAGE_ACCOUNT_NAME} -g ${AZURE_GROUP_NAME_FOR_VMS} --json | jq '.[0].value' -r)
 
 # Always upload the latest stemcell for lifecycle test
 tar -xf ${PWD}/stemcell/*.tgz -C /mnt/
