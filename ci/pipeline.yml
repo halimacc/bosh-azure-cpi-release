@@ -1,4 +1,10 @@
 ---
+resource_types:
+- name: azure-blob
+  type: docker-image
+  source:
+    repository: cfcloudops/azure-blobstore-concourse-resource
+
 groups:
   - name: bosh-azure-cpi-release
     jobs:
@@ -67,7 +73,7 @@ jobs:
     file: bosh-cpi-release/ci/tasks/build-candidate.yml
 
   - put: bosh-cpi-dev-artifacts
-    params: {file: out/.*\.tgz}
+    params: {file: out/*.tgz}
 
 - name: lifecycle
   serial: true
@@ -175,7 +181,7 @@ resources:
 - name: bosh-cpi-dev-artifacts
   type: s3
   source:
-    regexp: bosh-azure-cpi\.tgz
+    regexp: bosh-azure-cpi-([0-9\.]+)\.tgz
     bucket: {{s3_azure_cpi_pipeline_bucket}}
     region_name: {{s3_region__primary}}
     access_key_id: {{s3_access_key__primary}}
