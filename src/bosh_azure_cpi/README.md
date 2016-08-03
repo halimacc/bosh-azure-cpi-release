@@ -1,1 +1,0 @@
-Please see documentation [azure-cpi](http://bosh.io/docs/azure-cpi.html)
