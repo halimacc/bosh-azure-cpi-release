@@ -1,7 +1,6 @@
 module Bosh::AzureCloud
 
   class VipNetwork < Network
-    attr_reader :resource_group_name
 
     ##
     # Creates a new vip network

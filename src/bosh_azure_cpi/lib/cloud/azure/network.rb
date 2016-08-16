@@ -26,15 +26,10 @@ module Bosh::AzureCloud
       @cloud_properties = spec["cloud_properties"]
       @spec = spec
       @resource_group_name = @cloud_properties.nil? ? nil : @cloud_properties["resource_group_name"]
-
     end
     
     def cloud_properties
       @cloud_properties
-    end
-    
-    def spec
-      @spec
     end
   end
 end

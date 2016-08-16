@@ -112,7 +112,7 @@ module Bosh::AzureCloud
     # ==== Attributes
     #
     # @param [Hash] vm_params           - Parameters for creating the virtual machine.
-    # @param [Array] network_interfaces - Network Interface Instances.
+    # @param [Array] network_interfaces - Network Interface Instances. network_interfaces[0] will be picked as the primary network and able to bind public ip or load balancers.
     # @param [Hash] availability_set    - Availability set.
     #
     #  ==== Params
@@ -351,8 +351,8 @@ module Bosh::AzureCloud
         end
 
         vm[:network_interfaces] = []
-        properties['networkProfile']['networkInterfaces'].each do |nic_param|
-          network_interface = get_network_interface(nic_param['id'])
+        properties['networkProfile']['networkInterfaces'].each do |nic_properties|
+          network_interface = get_network_interface(nic_properties['id'])
           vm[:network_interfaces].push(network_interface)
         end
       end
@@ -718,10 +718,20 @@ module Bosh::AzureCloud
       interface
     end
 
-    def get_network_interfaces_specs_in_resource_group(resource_group_name)
-      network_interfaces = []
-      networkInterfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES, resource_group_name: resource_group_name)
-      get_resource_by_id(networkInterfaces_url)
+    def get_nic_names_like_instance_id(instance_id)
+      nic_names = []
+      unless instance_id.nil?
+        networkInterfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
+        results = get_resource_by_id(networkInterfaces_url)
+        unless results.nil? || results["value"].nil?
+          results["value"].each do |network_interface_spec|
+            if network_interface_spec["id"].match("^/subscriptions/(.*)/resourceGroups/(.*)/providers/Microsoft.Network/networkInterfaces/#{instance_id}(.*)$")
+              nic_names.push(network_interface_spec["name"])
+            end
+          end
+        end
+      end
+      nic_names
     end
 
     def delete_network_interface(name)

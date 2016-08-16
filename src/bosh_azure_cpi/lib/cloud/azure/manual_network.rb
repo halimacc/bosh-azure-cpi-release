@@ -3,7 +3,7 @@ module Bosh::AzureCloud
   class ManualNetwork < Network
     include Helpers
 
-    attr_reader  :virtual_network_name, :subnet_name, :security_group
+    attr_reader :virtual_network_name, :subnet_name, :security_group, :primary
 
     # create manual network
     # @param [String] name Network name
@@ -16,6 +16,7 @@ module Bosh::AzureCloud
       end
 
       @security_group = @cloud_properties["security_group"]
+      @primary = @cloud_properties["primary"]
 
       unless @cloud_properties["virtual_network_name"].nil?
         @virtual_network_name = @cloud_properties["virtual_network_name"]

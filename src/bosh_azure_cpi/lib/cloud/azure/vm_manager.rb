@@ -24,9 +24,7 @@ module Bosh::AzureCloud
       os_disk = @disk_manager.os_disk(instance_id)
       ephemeral_disk = @disk_manager.ephemeral_disk(instance_id)
 
-      load_balancer = get_load_balancer(resource_pool)
-
-      network_interfaces = create_network_interfaces(instance_id, storage_account, resource_pool, network_configurator, load_balancer)
+      network_interfaces = create_network_interfaces(instance_id, storage_account[:location], resource_pool, network_configurator)
       availability_set = create_availability_set(storage_account, resource_pool, env)
 
       vm_params = {
@@ -134,22 +132,22 @@ module Bosh::AzureCloud
       Base64.strict_encode64(JSON.dump(user_data))
     end
 
-    def get_network_subnet(private_network)
+    def get_network_subnet(network)
       subnet = nil
-      resource_group_name = private_network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : private_network.resource_group_name
-      subnet = @azure_client2.get_network_subnet_by_name(resource_group_name, private_network.virtual_network_name, private_network.subnet_name)
-      cloud_error("Cannot find the subnet `#{private_network.virtual_network_name}/#{private_network.subnet_name}' in the resource group `#{resource_group_name}'") if subnet.nil?
+      resource_group_name = network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : network.resource_group_name
+      subnet = @azure_client2.get_network_subnet_by_name(resource_group_name, network.virtual_network_name, network.subnet_name)
+      cloud_error("Cannot find the subnet `#{network.virtual_network_name}/#{network.subnet_name}' in the resource group `#{resource_group_name}'") if subnet.nil?
       subnet
     end
 
-    def get_network_security_group(resource_pool, private_network)
+    def get_network_security_group(resource_pool, network)
       network_security_group = nil
-      resource_group_name = private_network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : private_network.resource_group_name
+      resource_group_name = network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : network.resource_group_name
       security_group_name = @azure_properties["default_security_group"]
       if !resource_pool["security_group"].nil?
         security_group_name = resource_pool["security_group"]
-      elsif !private_network.security_group.nil?
-        security_group_name = private_network.security_group
+      elsif !network.security_group.nil?
+        security_group_name = network.security_group
       end
       network_security_group = @azure_client2.get_network_security_group_by_name(resource_group_name, security_group_name)
       if network_security_group.nil?
@@ -183,23 +181,24 @@ module Bosh::AzureCloud
       load_balancer
     end
 
-    def create_network_interfaces(instance_id, storage_account, resource_pool, network_configurator, load_balancer)
+    def create_network_interfaces(instance_id, location, resource_pool, network_configurator)
       network_interfaces = []
+      load_balancer = get_load_balancer(resource_pool)
       public_ip = get_public_ip(network_configurator.vip_network)
       networks = network_configurator.networks
-      networks.each_with_index do |private_network, index|
-        security_group = get_network_security_group(resource_pool, private_network)
+      networks.each_with_index do |network, index|
+        security_group = get_network_security_group(resource_pool, network)
         nic_name = "#{instance_id}-#{index}"
         nic_params = {
           :name                => nic_name,
-          :location            => storage_account[:location],
-          :private_ip          => (private_network.is_a? ManualNetwork) ? private_network.private_ip : nil,
+          :location            => location,
+          :private_ip          => (network.is_a? ManualNetwork) ? network.private_ip : nil,
           :public_ip           => index == 0 ? public_ip : nil,
           :security_group      => security_group,
           :ipconfig_name       => "ipconfig#{index}"
         }
 
-        subnet = get_network_subnet(private_network)
+        subnet = get_network_subnet(network)
         @azure_client2.create_network_interface(nic_params, subnet, AZURE_TAGS, load_balancer)
         network_interfaces.push(@azure_client2.get_network_interface_by_name(nic_name))
       end
@@ -207,19 +206,9 @@ module Bosh::AzureCloud
     end
 
     def delete_possible_network_interfaces(instance_id)
-      nic0_name = "#{instance_id}-0"
-      nic0 = @azure_client2.get_network_interface_by_name(nic0_name)
-      unless nic0.nil?
-        result = @azure_client2.parse_name_from_id(nic0[:id])
-        resource_group_name = result[:resource_group_name]
-        network_interfaces_specs = @azure_client2.get_network_interfaces_specs_in_resource_group(resource_group_name)
-        unless network_interfaces_specs.nil? || network_interfaces_specs["value"].nil?
-          network_interfaces_specs["value"].each do |network_interface_spec|
-            if network_interface_spec["id"].match("^/subscriptions/(.*)/resourceGroups/(.*)/providers/Microsoft.Network/networkInterfaces/#{instance_id}(.*)$")
-              @azure_client2.delete_network_interface(network_interface_spec["name"])
-            end
-          end
-        end
+      nic_names = @azure_client2.get_nic_names_like_instance_id(instance_id)
+      nic_names.each do |nic_name|
+        @azure_client2.delete_network_interface(nic_name)
       end
     end
 

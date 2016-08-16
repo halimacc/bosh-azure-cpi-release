@@ -55,7 +55,7 @@ module Bosh::AzureCloud
     #      "ip"               => "172.30.41.40",
     #      "gateway"          => "172.30.40.1",
     #      "dns"              => ["172.30.22.153", "172.30.22.154"],
-    #      "cloud_properties" => {"virtual_network_name"=>"boshvnet", "subnet_name"=>"BOSH"}
+    #      "cloud_properties" => {"virtual_network_name"=>"boshvnet", "subnet_name"=>"BOSH", "primary"=>true}
     #    }
     #  }
     #
