@@ -295,6 +295,26 @@ describe Bosh::AzureCloud::AzureClient2 do
       end
     end
 
+    context "when network interface count exceeds the max allowed NIC number" do
+      it "should raise AzureError" do
+        stub_request(:post, token_uri).to_return(
+          :status => 200,
+          :body => {
+            "access_token"=>valid_access_token,
+            "expires_on"=>expires_on
+          }.to_json,
+          :headers => {})
+        stub_request(:put, vm_uri).to_return(
+          :status => 400,
+          :body => 'The number of network interfaces for virtual machine xxx exceeds the maximum allowed for the virtual machine size Standard_D1.',
+          :headers => {})
+
+        expect {
+          azure_client2.create_virtual_machine(vm_params, network_interfaces)
+        }.to raise_error Bosh::AzureCloud::AzureError
+      end
+    end
+
     context "when token is valid, create operation is accepted and not completed" do
       it "should raise an error if check completion operation is not accepeted" do
         stub_request(:post, token_uri).to_return(

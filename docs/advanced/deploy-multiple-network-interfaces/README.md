@@ -24,6 +24,7 @@ Besides the existing subnets, create 2 more subnets (called `CloudFoundry2` and 
 azure network vnet subnet create --resource-group bosh-res-group --vnet-name boshvnet-crp --name CloudFoundry2 --address-prefix 10.0.40.0/24
 azure network vnet subnet create --resource-group bosh-res-group --vnet-name boshvnet-crp --name CloudFoundry3 --address-prefix 10.0.41.0/24
 ```
+>**NOTE:** All NICs must be connected to Subnets within the same VNET, you cannot deploy a VM on multiple VNETs.
 
 ## 3 Update manifest
 
@@ -140,5 +141,47 @@ azure network vnet subnet create --resource-group bosh-res-group --vnet-name bos
   Check network numbers by `ifconfig` in the VM
 
   ```
-  bosh ssh runner_z1 0 ifconfig
+  bosh ssh cell_z1 0 ifconfig
+  ```
+
+  you will get outputs like this:
+
+  ```
+  cell_z1/
+  eth0      Link encap:Ethernet  HWaddr 00:0d:3a:01:15:dc
+            inet addr:10.0.16.107  Bcast:10.0.31.255  Mask:255.255.240.0
+            inet6 addr: fe80::20d:3aff:fe01:15dc/64 Scope:Link
+            UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+            RX packets:252819 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:61860 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1000
+            RX bytes:357358429 (357.3 MB)  TX bytes:4537262 (4.5 MB)
+
+  eth1      Link encap:Ethernet  HWaddr 00:0d:3a:01:12:2b
+            inet addr:10.0.40.5  Bcast:10.0.40.255  Mask:255.255.255.0
+            inet6 addr: fe80::20d:3aff:fe01:122b/64 Scope:Link
+            UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+            RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:30 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1000
+            RX bytes:762 (762.0 B)  TX bytes:2172 (2.1 KB)
+
+  eth2      Link encap:Ethernet  HWaddr 00:0d:3a:01:15:69
+            inet addr:10.0.41.4  Bcast:10.0.41.255  Mask:255.255.255.0
+            inet6 addr: fe80::20d:3aff:fe01:1569/64 Scope:Link
+            UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+            RX packets:2 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:30 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:1000
+            RX bytes:762 (762.0 B)  TX bytes:2172 (2.1 KB)
+
+  lo        Link encap:Local Loopback
+            inet addr:127.0.0.1  Mask:255.0.0.0
+            inet6 addr: ::1/128 Scope:Host
+            UP LOOPBACK RUNNING  MTU:65536  Metric:1
+            RX packets:2010 errors:0 dropped:0 overruns:0 frame:0
+            TX packets:2010 errors:0 dropped:0 overruns:0 carrier:0
+            collisions:0 txqueuelen:0
+            RX bytes:265696 (265.6 KB)  TX bytes:265696 (265.6 KB)
+
   ```
