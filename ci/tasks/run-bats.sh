@@ -138,7 +138,7 @@ jobs:
     networks:
     <% properties.job_networks.each_with_index do |network, i| %>
       - name: <%= network.name %>
-        <% if i == 0 %>
+        <% if i == 1 %>
         default: [dns, gateway]
         <% end %>
       <% if network.type == 'manual' %>
