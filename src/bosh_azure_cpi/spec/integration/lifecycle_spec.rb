@@ -213,7 +213,8 @@ describe Bosh::AzureCloud::Cloud do
           'type' => 'dynamic',
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet_name,
+            'primary' => true
           }
         },
         'network_b' => {
