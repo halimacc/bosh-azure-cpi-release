@@ -19,6 +19,8 @@ module Bosh::AzureCloud
     ##
     # Creates new network spec
     #
+    # networks[0] is always the primary network for the VM
+    #
     # @param [Hash] azure_properties global azure properties
     # @param [Hash] spec raw network spec passed by director
     def initialize(azure_properties, spec)
@@ -32,12 +34,8 @@ module Bosh::AzureCloud
       @networks = []
       @vip_network = nil
 
-      primary_networks = []
-      secondary_networks = []
-
       logger.debug ("networks: `#{spec}'")
       spec.each_pair do |name, network_spec|
-
         network = nil
         network_type = network_spec["type"] || "manual"
 
@@ -58,31 +56,19 @@ module Bosh::AzureCloud
                         "can only handle `dynamic', `vip', or `manual' network types")
         end
 
-        # For multiple networks, bosh will require (only) 1 default `dns' and (only) 1 default `gateway'.
-        # The network with default `gateway' (primary_networks[0]) will be the primary network.
+        # @networks[0] is always the primary network.
         #
-        # For single network, primary_networks can be empty because `default' is not required,
-        # in this case primary_networks[0] or secondary_networks[0] can be the primary network.
+        # The network with 'default: ["gateway"]' will be the primary network.
+        # For single network, 'default: ["gateway"]' can be ignored, it will automatically picked as primary network.
         #
         if network_type == "dynamic" || network_type == "manual"
           if network.has_default_gateway?
-            primary_networks.push(network)
+            @networks.insert(0, network)
           else
-            secondary_networks.push(network)
+            @networks.push(network)
           end
         end
       end
-
-      if primary_networks.size > 1
-        cloud_error("Only one primary network is allowed")
-      end
-
-      if primary_networks.size == 0 && secondary_networks.size > 1
-        cloud_error("Primary network must be defined for multiple networks")
-      end
-
-      # Make sure @networks[0] is the primary network
-      @networks = primary_networks + secondary_networks
 
       if @networks.empty?
         cloud_error("At least one dynamic or manual network must be defined")

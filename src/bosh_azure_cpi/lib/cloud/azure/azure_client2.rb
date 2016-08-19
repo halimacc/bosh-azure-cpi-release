@@ -685,8 +685,12 @@ module Bosh::AzureCloud
     end
 
     def get_network_interface(url)
-      interface = nil
       result = get_resource_by_id(url)
+      get_network_interface_from_result(result)
+    end
+
+    def get_network_interface_from_result(result) 
+      interface = nil
       unless result.nil?
         interface = {}
         interface[:id] = result['id']
@@ -718,22 +722,21 @@ module Bosh::AzureCloud
       interface
     end
 
-    # Query network interfaces whose id matches pattern /#{instance_id}/. #{instance_id} stands for a VM, and NICs of that VM are "#{instance_id}-0", "#{instance_id}-1" and so on.
+    # Query network interfaces whose name matches pattern /#{instance_id}/. #{instance_id} stands for a VM, and NICs of that VM are "#{instance_id}-0", "#{instance_id}-1" and so on.
     # Return array of network interface names.
-    def list_network_interface_names_by_instance_id(instance_id)
-      nic_names = []
-      unless instance_id.nil?
-        network_interfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
-        results = get_resource_by_id(network_interfaces_url)
-        unless results.nil? || results["value"].nil?
-          results["value"].each do |network_interface_spec|
-            if network_interface_spec["name"].include? instance_id
-              nic_names.push(network_interface_spec["name"])
-            end
+    def list_network_interfaces_by_instance_id(instance_id)
+      network_interfaces = []
+      network_interfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
+      results = get_resource_by_id(network_interfaces_url)
+      unless results.nil? || results["value"].nil?
+        results["value"].each do |network_interface_spec|
+          if network_interface_spec["name"].include?(instance_id)
+            network_interface = get_network_interface_from_result(network_interface_spec)
+            network_interfaces.push(network_interface) unless network_interface.nil?
           end
         end
       end
-      nic_names
+      network_interfaces
     end
 
     def delete_network_interface(name)

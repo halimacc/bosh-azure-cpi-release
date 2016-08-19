@@ -31,13 +31,11 @@ module Bosh::AzureCloud
     end
 
     def has_default_dns?
-      return true if @spec["default"] && (@spec["default"].include? "dns")
-      false
+      (!@spec["default"].nil?) && (@spec["default"].include?("dns"))
     end
 
     def has_default_gateway?
-      return true if @spec["default"] && (@spec["default"].include? "gateway")
-      false
+      (!@spec["default"].nil?) && (@spec["default"].include?("gateway"))
     end
   end
 end

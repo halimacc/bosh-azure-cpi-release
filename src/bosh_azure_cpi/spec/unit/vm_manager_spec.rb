@@ -127,7 +127,7 @@ describe Bosh::AzureCloud::VMManager do
       let(:resource_pool) { {} }
 
       before do
-        allow(client2).to receive(:list_network_interface_names_by_instance_id).
+        allow(client2).to receive(:list_network_interfaces_by_instance_id).
           with(instance_id).
           and_return([])
       end
@@ -145,7 +145,7 @@ describe Bosh::AzureCloud::VMManager do
     context "when the resource group name is not specified in the network spec" do
       context "when subnet is not found in the default resource group" do
         before do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_load_balancer_by_name).
@@ -168,7 +168,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when network security group is not found in the default resource group" do
         before do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_load_balancer_by_name).
@@ -208,7 +208,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when subnet is not found in the specified resource group" do
         it "should raise an error" do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_network_subnet_by_name).
@@ -222,7 +222,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when network security group is not found in the specified resource group nor the default resource group" do
         before do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_network_security_group_by_name).
@@ -250,7 +250,7 @@ describe Bosh::AzureCloud::VMManager do
  
       context "when the public ip list azure returns is empty" do
         it "should raise an error" do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:list_public_ips).
@@ -277,7 +277,7 @@ describe Bosh::AzureCloud::VMManager do
         }
 
         it "should raise an error" do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:list_public_ips).
@@ -296,7 +296,7 @@ describe Bosh::AzureCloud::VMManager do
 
     context "when load balancer can not be found" do
       before do
-        allow(client2).to receive(:list_network_interface_names_by_instance_id).
+        allow(client2).to receive(:list_network_interfaces_by_instance_id).
           with(instance_id).
           and_return([])
       end
@@ -329,9 +329,9 @@ describe Bosh::AzureCloud::VMManager do
       end
 
       it "should raise an error" do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
-            with(instance_id).
-            and_return([])
+        allow(client2).to receive(:list_network_interfaces_by_instance_id).
+          with(instance_id).
+          and_return([])
         allow(client2).to receive(:create_network_interface).
           and_raise("network interface is not created")
 
@@ -344,10 +344,17 @@ describe Bosh::AzureCloud::VMManager do
       end
 
       context "when one network interface is create and the another one is not" do
+        let(:network_interface) {
+          {
+            :id   => "/subscriptions/fake-subscription/resourceGroups/fake-resource-group/providers/Microsoft.Network/networkInterfaces/#{instance_id}-x",
+            :name => "#{instance_id}-x"
+          }
+        }
+
         before do
-          allow(client2).to receive(:list_network_interface_names_by_instance_id).
+          allow(client2).to receive(:list_network_interfaces_by_instance_id).
             with(instance_id).
-            and_return(["#{instance_id}-0"])
+            and_return([network_interface])
           allow(client2).to receive(:get_network_subnet_by_name).
             and_return(subnet)
           allow(client2).to receive(:get_load_balancer_by_name).

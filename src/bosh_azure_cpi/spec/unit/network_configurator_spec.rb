@@ -118,26 +118,6 @@ describe Bosh::AzureCloud::NetworkConfigurator do
       }.to raise_error Bosh::Clouds::CloudError, "More than one vip network for `network2'"
     end
 
-    it "should raise an error if manual primary networks are defined" do
-      network_spec = {
-        "network1" => dynamic,
-        "network2" => dynamic
-      }
-      expect {
-        Bosh::AzureCloud::NetworkConfigurator.new(azure_properties, network_spec)
-      }.to raise_error Bosh::Clouds::CloudError, "Only one primary network is allowed"
-    end
-
-    it "should raise an error if multiple networks are defined without primary network" do
-      network_spec = {
-        "network1" => manual,
-        "network2" => manual
-      }
-      expect {
-        Bosh::AzureCloud::NetworkConfigurator.new(azure_properties, network_spec)
-      }.to raise_error Bosh::Clouds::CloudError, "Primary network must be defined for multiple networks"
-    end
-
     it "should raise an error if an illegal network type is used" do
       network_spec = {
         "network1" => {"type" => "foo"}

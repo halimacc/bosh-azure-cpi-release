@@ -205,9 +205,9 @@ module Bosh::AzureCloud
     end
 
     def delete_possible_network_interfaces(instance_id)
-      nic_names = @azure_client2.list_network_interface_names_by_instance_id(instance_id)
-      nic_names.each do |nic_name|
-        @azure_client2.delete_network_interface(nic_name)
+      network_interfaces = @azure_client2.list_network_interfaces_by_instance_id(instance_id)
+      network_interfaces.each do |network_interface|
+        @azure_client2.delete_network_interface(network_interface[:name])
       end
     end
 
