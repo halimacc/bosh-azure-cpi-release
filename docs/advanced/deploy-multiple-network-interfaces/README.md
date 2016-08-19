@@ -55,7 +55,7 @@ azure network vnet subnet create --resource-group bosh-res-group --vnet-name bos
       security_group: nsg-cf
   ```
 
-* Create new network specs (called `cf_private2` and `cf_private3`), and assign `primary` network by seting `primary: true` in `cloud_properties` of network spec
+* Create new network specs (called `cf_private2` and `cf_private3`)
 
   ```yaml
   networks:
@@ -70,7 +70,6 @@ azure network vnet subnet create --resource-group bosh-res-group --vnet-name bos
       cloud_properties:
         virtual_network_name: boshvnet-crp
         subnet_name: CloudFoundry
-        primary: true
   - name: cf_private2
     type: manual
     subnets:
@@ -94,7 +93,6 @@ azure network vnet subnet create --resource-group bosh-res-group --vnet-name bos
         virtual_network_name: boshvnet-crp
         subnet_name: CloudFoundry3
   ```
-  >**NOTE:** When there are multiple networks, you must have and only have 1 `primary` network defined. Only the `primary` network be able to bind to public ip or load balancers.
 
 * Assign additional networks and resource_pool to the instance
 
@@ -128,7 +126,7 @@ azure network vnet subnet create --resource-group bosh-res-group --vnet-name bos
         rep:
           zone: z1
   ```
-  >**NOTE:** when there are multiple NICs, bosh requires explicit definition for default `dns` and `gateway` to decide which networki's DNS settings to use and which network's gateway should be the default gateway on the VM. In this example, both `dns` and `gateway` are allocated to values in `cf_private`.
+  >**NOTE:** when there are multiple NICs, bosh requires explicit definition for default `dns` and `gateway` to decide which network's DNS settings to use and which network's gateway should be the default gateway on the VM. In this example, both `dns` and `gateway` are allocated to values in `cf_private`.
 
 ## 3 Deploy cloud foundry
 

@@ -93,7 +93,7 @@ describe Bosh::AzureCloud::VMManager do
         and_return('public-ip')
 
       allow(manual_network).to receive(:resource_group_name).
-        and_return(nil)
+        and_return(MOCK_RESOURCE_GROUP_NAME)
       allow(manual_network).to receive(:security_group).
         and_return(nil)
       allow(manual_network).to receive(:virtual_network_name).
@@ -104,7 +104,7 @@ describe Bosh::AzureCloud::VMManager do
         and_return('private-ip')
 
       allow(dynamic_network).to receive(:resource_group_name).
-        and_return(nil)
+        and_return(MOCK_RESOURCE_GROUP_NAME)
       allow(dynamic_network).to receive(:security_group).
         and_return(nil)
       allow(dynamic_network).to receive(:virtual_network_name).
@@ -127,7 +127,7 @@ describe Bosh::AzureCloud::VMManager do
       let(:resource_pool) { {} }
 
       before do
-        allow(client2).to receive(:get_nic_names_like_instance_id).
+        allow(client2).to receive(:list_network_interface_names_by_instance_id).
           with(instance_id).
           and_return([])
       end
@@ -145,7 +145,7 @@ describe Bosh::AzureCloud::VMManager do
     context "when the resource group name is not specified in the network spec" do
       context "when subnet is not found in the default resource group" do
         before do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_load_balancer_by_name).
@@ -168,7 +168,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when network security group is not found in the default resource group" do
         before do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_load_balancer_by_name).
@@ -208,7 +208,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when subnet is not found in the specified resource group" do
         it "should raise an error" do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_network_subnet_by_name).
@@ -222,7 +222,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when network security group is not found in the specified resource group nor the default resource group" do
         before do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:get_network_security_group_by_name).
@@ -250,7 +250,7 @@ describe Bosh::AzureCloud::VMManager do
  
       context "when the public ip list azure returns is empty" do
         it "should raise an error" do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:list_public_ips).
@@ -277,7 +277,7 @@ describe Bosh::AzureCloud::VMManager do
         }
 
         it "should raise an error" do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
           allow(client2).to receive(:list_public_ips).
@@ -296,7 +296,7 @@ describe Bosh::AzureCloud::VMManager do
 
     context "when load balancer can not be found" do
       before do
-        allow(client2).to receive(:get_nic_names_like_instance_id).
+        allow(client2).to receive(:list_network_interface_names_by_instance_id).
           with(instance_id).
           and_return([])
       end
@@ -329,7 +329,7 @@ describe Bosh::AzureCloud::VMManager do
       end
 
       it "should raise an error" do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return([])
         allow(client2).to receive(:create_network_interface).
@@ -345,7 +345,7 @@ describe Bosh::AzureCloud::VMManager do
 
       context "when one network interface is create and the another one is not" do
         before do
-          allow(client2).to receive(:get_nic_names_like_instance_id).
+          allow(client2).to receive(:list_network_interface_names_by_instance_id).
             with(instance_id).
             and_return(["#{instance_id}-0"])
           allow(client2).to receive(:get_network_subnet_by_name).

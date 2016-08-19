@@ -140,9 +140,9 @@ module Bosh::AzureCloud
     def create_virtual_machine(vm_params, network_interfaces, availability_set = nil)
       url = rest_api_url(REST_API_PROVIDER_COMPUTER, REST_API_COMPUTER_VIRTUAL_MACHINES, name: vm_params[:name])
 
-      networkInterfaces_params = []
+      network_interfaces_params = []
       network_interfaces.each_with_index do |network_interface, index|
-        networkInterfaces_params.push(
+        network_interfaces_params.push(
           {
             'id' => network_interface[:id],
             'properties' => {
@@ -192,7 +192,7 @@ module Bosh::AzureCloud
             }
           },
           'networkProfile' => {
-            'networkInterfaces' => networkInterfaces_params
+            'networkInterfaces' => network_interfaces_params
           }
         }
       }
@@ -718,14 +718,16 @@ module Bosh::AzureCloud
       interface
     end
 
-    def get_nic_names_like_instance_id(instance_id)
+    # Query network interfaces whose id matches pattern /#{instance_id}/. #{instance_id} stands for a VM, and NICs of that VM are "#{instance_id}-0", "#{instance_id}-1" and so on.
+    # Return array of network interface names.
+    def list_network_interface_names_by_instance_id(instance_id)
       nic_names = []
       unless instance_id.nil?
-        networkInterfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
-        results = get_resource_by_id(networkInterfaces_url)
+        network_interfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
+        results = get_resource_by_id(network_interfaces_url)
         unless results.nil? || results["value"].nil?
           results["value"].each do |network_interface_spec|
-            if network_interface_spec["id"].match("^/subscriptions/(.*)/resourceGroups/(.*)/providers/Microsoft.Network/networkInterfaces/#{instance_id}(.*)$")
+            if network_interface_spec["name"].include? instance_id
               nic_names.push(network_interface_spec["name"])
             end
           end

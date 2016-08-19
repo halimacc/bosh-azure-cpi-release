@@ -211,10 +211,10 @@ describe Bosh::AzureCloud::Cloud do
       {
         'network_a' => {
           'type' => 'dynamic',
+          'default' => ['dns', 'gateway'],
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name,
-            'primary' => true
+            'subnet_name' => subnet_name
           }
         },
         'network_b' => {

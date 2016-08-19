@@ -86,9 +86,6 @@ networks:
       <% if network.cloud_properties.security_group %>
       security_group: <%= network.cloud_properties.security_group %>
       <% end %>
-      <% if network.cloud_properties.primary %>
-      primary: <%= network.cloud_properties.primary %>
-      <% end %>
   <% elsif network.type == 'dynamic' %>
   subnets:
   - range: <%= network.cidr %>
@@ -101,9 +98,6 @@ networks:
       subnet_name: <%= network.cloud_properties.subnet_name %>
       <% if network.cloud_properties.security_group %>
       security_group: <%= network.cloud_properties.security_group %>
-      <% end %>
-      <% if network.cloud_properties.primary %>
-      primary: <%= network.cloud_properties.primary %>
       <% end %>
   <% elsif network.type == 'vip' %>
   <% if network.cloud_properties.resource_group_name %>
@@ -218,7 +212,6 @@ properties:
       virtual_network_name: ${AZURE_VNET_NAME_FOR_BATS}
       subnet_name: ${AZURE_CF_SUBNET_NAME}
       security_group: ${AZURE_DEFAULT_SECURITY_GROUP}
-      primary: true
     cidr: ${BAT_NETWORK_CIDR}
     reserved: [${BAT_NETWORK_RESERVED_RANGE}]
     static: [${BAT_NETWORK_STATIC_RANGE}]

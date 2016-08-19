@@ -11,25 +11,30 @@ module Bosh::AzureCloud
     ##
     # Creates a new network
     #
+    # @azure_properties global Azure properties
     # @param [String] name Network name
     # @param [Hash] spec Raw network spec
-    def initialize(name, spec)
+    def initialize(azure_properties, name, spec)
       unless spec.is_a?(Hash)
         raise ArgumentError, "Invalid spec, Hash expected, " \
                              "#{spec.class} provided"
       end
 
       @logger = Bosh::Clouds::Config.logger
-
+      @azure_properties = azure_properties
       @name = name
       @ip = spec["ip"]
       @cloud_properties = spec["cloud_properties"]
       @spec = spec
-      @resource_group_name = @cloud_properties.nil? ? nil : @cloud_properties["resource_group_name"]
+      unless @cloud_properties.nil? || @cloud_properties["resource_group_name"].nil?
+        @resource_group_name = @cloud_properties["resource_group_name"]
+      else
+        @resource_group_name =  @azure_properties["resource_group_name"]
+      end
     end
-    
-    def cloud_properties
-      @cloud_properties
+
+    def spec
+      @spec
     end
   end
 end

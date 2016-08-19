@@ -3,12 +3,12 @@ module Bosh::AzureCloud
   class DynamicNetwork < Network
     include Helpers
 
-    attr_reader :virtual_network_name, :subnet_name, :security_group, :primary
+    attr_reader :virtual_network_name, :subnet_name, :security_group
 
     # create dynamic network
     # @param [String] name Network name
     # @param [Hash] spec Raw network spec
-    def initialize(name, spec)
+    def initialize(azure_properties, name, spec)
       super
 
       if @cloud_properties.nil?
@@ -16,7 +16,6 @@ module Bosh::AzureCloud
       end
 
       @security_group = @cloud_properties["security_group"]
-      @primary = @cloud_properties["primary"]
 
       unless @cloud_properties["virtual_network_name"].nil?
         @virtual_network_name = @cloud_properties["virtual_network_name"]
@@ -31,5 +30,14 @@ module Bosh::AzureCloud
       end
     end
 
+    def has_default_dns?
+      return true if @spec["default"] && (@spec["default"].include? "dns")
+      false
+    end
+
+    def has_default_gateway?
+      return true if @spec["default"] && (@spec["default"].include? "gateway")
+      false
+    end
   end
 end

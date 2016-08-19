@@ -24,12 +24,13 @@ module Bosh::AzureCloud
       os_disk = @disk_manager.os_disk(instance_id)
       ephemeral_disk = @disk_manager.ephemeral_disk(instance_id)
 
-      network_interfaces = create_network_interfaces(instance_id, storage_account[:location], resource_pool, network_configurator)
-      availability_set = create_availability_set(storage_account, resource_pool, env)
+      location = storage_account[:location]
+      network_interfaces = create_network_interfaces(instance_id, location, resource_pool, network_configurator)
+      availability_set = create_availability_set(location, resource_pool, env)
 
       vm_params = {
         :name                => instance_id,
-        :location            => storage_account[:location],
+        :location            => location,
         :tags                => AZURE_TAGS,
         :vm_size             => vm_size,
         :username            => @azure_properties['ssh_user'],
@@ -133,16 +134,14 @@ module Bosh::AzureCloud
     end
 
     def get_network_subnet(network)
-      subnet = nil
-      resource_group_name = network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : network.resource_group_name
-      subnet = @azure_client2.get_network_subnet_by_name(resource_group_name, network.virtual_network_name, network.subnet_name)
-      cloud_error("Cannot find the subnet `#{network.virtual_network_name}/#{network.subnet_name}' in the resource group `#{resource_group_name}'") if subnet.nil?
+      subnet = @azure_client2.get_network_subnet_by_name(network.resource_group_name, network.virtual_network_name, network.subnet_name)
+      cloud_error("Cannot find the subnet `#{network.virtual_network_name}/#{network.subnet_name}' in the resource group `#{network.resource_group_name}'") if subnet.nil?
       subnet
     end
 
     def get_network_security_group(resource_pool, network)
       network_security_group = nil
-      resource_group_name = network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : network.resource_group_name
+      resource_group_name = network.resource_group_name
       security_group_name = @azure_properties["default_security_group"]
       if !resource_pool["security_group"].nil?
         security_group_name = resource_pool["security_group"]
@@ -164,7 +163,7 @@ module Bosh::AzureCloud
     def get_public_ip(vip_network)
       public_ip = nil
       unless vip_network.nil?
-        resource_group_name = vip_network.resource_group_name.nil? ? @azure_properties['resource_group_name'] : vip_network.resource_group_name
+        resource_group_name = vip_network.resource_group_name
         public_ip = @azure_client2.list_public_ips(resource_group_name).find { |ip| ip[:ip_address] == vip_network.public_ip }
         cloud_error("Cannot find the public IP address `#{vip_network.public_ip}' in the resource group `#{resource_group_name}'") if public_ip.nil?
       end
@@ -206,13 +205,13 @@ module Bosh::AzureCloud
     end
 
     def delete_possible_network_interfaces(instance_id)
-      nic_names = @azure_client2.get_nic_names_like_instance_id(instance_id)
+      nic_names = @azure_client2.list_network_interface_names_by_instance_id(instance_id)
       nic_names.each do |nic_name|
         @azure_client2.delete_network_interface(nic_name)
       end
     end
 
-    def create_availability_set(storage_account, resource_pool, env)
+    def create_availability_set(location, resource_pool, env)
       availability_set = nil
 
       availability_set_name = resource_pool.fetch('availability_set', nil)
@@ -227,7 +226,7 @@ module Bosh::AzureCloud
         if availability_set.nil?
           avset_params = {
             :name                         => availability_set_name,
-            :location                     => storage_account[:location],
+            :location                     => location,
             :tags                         => AZURE_TAGS,
             :platform_update_domain_count => resource_pool['platform_update_domain_count'] || 5,
             :platform_fault_domain_count  => resource_pool['platform_fault_domain_count'] || 3

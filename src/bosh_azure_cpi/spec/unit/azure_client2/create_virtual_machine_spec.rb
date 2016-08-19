@@ -311,7 +311,7 @@ describe Bosh::AzureCloud::AzureClient2 do
 
         expect {
           azure_client2.create_virtual_machine(vm_params, network_interfaces)
-        }.to raise_error Bosh::AzureCloud::AzureError
+        }.to raise_error /The number of network interfaces for virtual machine xxx exceeds the maximum/
       end
     end
 
