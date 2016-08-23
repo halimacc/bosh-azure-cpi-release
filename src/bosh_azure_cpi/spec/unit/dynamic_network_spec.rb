@@ -1,13 +1,12 @@
 require "spec_helper"
 
-describe Bosh::AzureCloud::ManualNetwork do
+describe Bosh::AzureCloud::DynamicNetwork do
   let(:azure_properties) { mock_azure_properties }
   let(:network_spec) {{}}
 
   context "when everything is fine" do
     let(:network_spec) {
       {
-        "ip" => "fake-ip",
         "default" => ["dns", "gateway"],
         "cloud_properties"=>{
           "virtual_network_name"=>"foo",
@@ -19,9 +18,8 @@ describe Bosh::AzureCloud::ManualNetwork do
     }
 
     it "should return properties with right values" do
-      sn = Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
+      sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
 
-      expect(sn.private_ip).to eq("fake-ip")
       expect(sn.resource_group_name).to eq("fake_resource_group")
       expect(sn.virtual_network_name).to eq("foo")
       expect(sn.subnet_name).to eq("bar")
@@ -41,8 +39,8 @@ describe Bosh::AzureCloud::ManualNetwork do
 
       it "should raise an error" do
           expect {
-            Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
-          }.to raise_error(/cloud_properties required for manual network/)
+            Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
+          }.to raise_error(/cloud_properties required for dynamic network/)
       end
     end
 
@@ -58,8 +56,8 @@ describe Bosh::AzureCloud::ManualNetwork do
 
         it "should raise an error" do
             expect {
-              Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
-            }.to raise_error(/virtual_network_name required for manual network/)
+              Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
+            }.to raise_error(/virtual_network_name required for dynamic network/)
         end
       end
 
@@ -75,8 +73,8 @@ describe Bosh::AzureCloud::ManualNetwork do
 
         it "should raise an error" do
             expect {
-              Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
-            }.to raise_error(/virtual_network_name required for manual network/)
+              Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
+            }.to raise_error(/virtual_network_name required for dynamic network/)
         end
       end
     end
@@ -93,8 +91,8 @@ describe Bosh::AzureCloud::ManualNetwork do
 
         it "should raise an error" do
             expect {
-              Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
-            }.to raise_error(/subnet_name required for manual network/)
+              Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
+            }.to raise_error(/subnet_name required for dynamic network/)
         end
       end
 
@@ -110,8 +108,8 @@ describe Bosh::AzureCloud::ManualNetwork do
 
         it "should raise an error" do
             expect {
-              Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
-            }.to raise_error(/subnet_name required for manual network/)
+              Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
+            }.to raise_error(/subnet_name required for dynamic network/)
         end
       end
     end
@@ -128,7 +126,7 @@ describe Bosh::AzureCloud::ManualNetwork do
       }
 
       it "should return nil for security_group" do
-        sn = Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
+        sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
         expect(sn.security_group).to eq(nil)
       end
     end
@@ -145,7 +143,7 @@ describe Bosh::AzureCloud::ManualNetwork do
       }
 
       it "should return resource_group_name from global azure properties" do
-        sn = Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
+        sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
         expect(sn.resource_group_name).to eq(azure_properties["resource_group_name"])
       end
     end
@@ -162,12 +160,12 @@ describe Bosh::AzureCloud::ManualNetwork do
       }
 
       it "should return false for #has_default_dns?" do
-        sn = Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
+        sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
         expect(sn.has_default_dns?).to eq(false)
       end
 
       it "should return false for #has_default_gateway?" do
-        sn = Bosh::AzureCloud::ManualNetwork.new(azure_properties, "default", network_spec)
+        sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
         expect(sn.has_default_dns?).to eq(false)
       end
     end

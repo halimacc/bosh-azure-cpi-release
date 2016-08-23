@@ -111,9 +111,9 @@ module Bosh::AzureCloud
     #
     # ==== Attributes
     #
-    # @param [Hash] vm_params         - Parameters for creating the virtual machine.
-    # @param [Hash] network_interface - Network Interface Instance.
-    # @param [Hash] availability_set  - Availability set.
+    # @param [Hash] vm_params           - Parameters for creating the virtual machine.
+    # @param [Array] network_interfaces - Network Interface Instances. network_interfaces[0] will be picked as the primary network and able to bind to public ip or load balancers.
+    # @param [Hash] availability_set    - Availability set.
     #
     #  ==== Params
     #
@@ -137,8 +137,21 @@ module Bosh::AzureCloud
     # *   +:disk_caching+       - String. The caching option of the ephemeral disk. Caching option: None, ReadOnly or ReadWrite.
     # *   +:disk_size+          - Integer. The size in GiB of the ephemeral disk.
     #
-    def create_virtual_machine(vm_params, network_interface, availability_set = nil)
+    def create_virtual_machine(vm_params, network_interfaces, availability_set = nil)
       url = rest_api_url(REST_API_PROVIDER_COMPUTER, REST_API_COMPUTER_VIRTUAL_MACHINES, name: vm_params[:name])
+
+      network_interfaces_params = []
+      network_interfaces.each_with_index do |network_interface, index|
+        network_interfaces_params.push(
+          {
+            'id' => network_interface[:id],
+            'properties' => {
+              'primary' => index == 0 ? true : false
+            }
+          }
+        )
+      end
+
       vm = {
         'name'       => vm_params[:name],
         'location'   => vm_params[:location],
@@ -179,11 +192,7 @@ module Bosh::AzureCloud
             }
           },
           'networkProfile' => {
-            'networkInterfaces' => [
-              {
-                'id' => network_interface[:id]
-              }
-            ]
+            'networkInterfaces' => network_interfaces_params
           }
         }
       }
@@ -341,8 +350,11 @@ module Bosh::AzureCloud
           vm[:data_disks].push(disk)
         end
 
-        interface_id = properties['networkProfile']['networkInterfaces'][0]['id']
-        vm[:network_interface] = get_network_interface(interface_id)
+        vm[:network_interfaces] = []
+        properties['networkProfile']['networkInterfaces'].each do |nic_properties|
+          network_interface = get_network_interface(nic_properties['id'])
+          vm[:network_interfaces].push(network_interface)
+        end
       end
       vm
     end
@@ -619,6 +631,7 @@ module Bosh::AzureCloud
     # Accepted key/value pairs are:
     # * +:name+          - String. Name of network interface.
     # * +:location+      - String. The location where the network interface will be created.
+    # * +:ipconfig_name+ - String. The name of ipConfigurations for the network interface.
     # * +:private_ip     - String. Private IP address which the network interface will use.
     # * +:dns_servers    - Array. DNS servers. 
     # * +:public_ip      - Hash. The public IP which the network interface is binded to.
@@ -636,7 +649,7 @@ module Bosh::AzureCloud
           },
           'ipConfigurations' => [
             {
-              'name'        => 'ipconfig1',
+              'name'        => nic_params[:ipconfig_name],
               'properties'  => {
                 'privateIPAddress'          => nic_params[:private_ip], 
                 'privateIPAllocationMethod' => nic_params[:private_ip].nil? ? 'Dynamic' : 'Static',
@@ -659,7 +672,7 @@ module Bosh::AzureCloud
             'id' => load_balancer[:backend_address_pools][0][:id]
           }
         ]
-        interface['properties']['ipConfigurations'][0]['properties']['loadBalancerInboundNatRules'] = 
+        interface['properties']['ipConfigurations'][0]['properties']['loadBalancerInboundNatRules'] =
           load_balancer[:frontend_ip_configurations][0][:inbound_nat_rules]
       end
 
@@ -672,8 +685,12 @@ module Bosh::AzureCloud
     end
 
     def get_network_interface(url)
-      interface = nil
       result = get_resource_by_id(url)
+      get_network_interface_from_result(result)
+    end
+
+    def get_network_interface_from_result(result) 
+      interface = nil
       unless result.nil?
         interface = {}
         interface[:id] = result['id']
@@ -703,6 +720,23 @@ module Bosh::AzureCloud
         end
       end
       interface
+    end
+
+    # Query network interfaces whose name matches pattern /#{instance_id}/. #{instance_id} stands for a VM, and NICs of that VM are "#{instance_id}-0", "#{instance_id}-1" and so on.
+    # Return array of network interface names.
+    def list_network_interfaces_by_instance_id(instance_id)
+      network_interfaces = []
+      network_interfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
+      results = get_resource_by_id(network_interfaces_url)
+      unless results.nil? || results["value"].nil?
+        results["value"].each do |network_interface_spec|
+          if network_interface_spec["name"].include?(instance_id)
+            network_interface = get_network_interface_from_result(network_interface_spec)
+            network_interfaces.push(network_interface) unless network_interface.nil?
+          end
+        end
+      end
+      network_interfaces
     end
 
     def delete_network_interface(name)
