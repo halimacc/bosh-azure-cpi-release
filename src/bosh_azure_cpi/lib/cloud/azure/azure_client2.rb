@@ -112,7 +112,7 @@ module Bosh::AzureCloud
     # ==== Attributes
     #
     # @param [Hash] vm_params           - Parameters for creating the virtual machine.
-    # @param [Array] network_interfaces - Network Interface Instances. network_interfaces[0] will be picked as the primary network and able to bind public ip or load balancers.
+    # @param [Array] network_interfaces - Network Interface Instances. network_interfaces[0] will be picked as the primary network and able to bind to public ip or load balancers.
     # @param [Hash] availability_set    - Availability set.
     #
     #  ==== Params
