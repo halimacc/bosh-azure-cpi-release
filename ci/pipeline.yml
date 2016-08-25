@@ -141,7 +141,8 @@ jobs:
         AZURE_DEFAULT_SECURITY_GROUP:   {{azure_default_security_group}}
         BAT_NETWORK1_CIDR:              {{bat_network1_cidr}}
         BAT_NETWORK2_CIDR:              {{bat_network2_cidr}}
-        BAT_NETWORK_RESERVED_RANGE:     {{bat_network_reserved_range}}
+        BAT_NETWORK1_RESERVED_RANGE:    {{bat_network1_reserved_range}}
+        BAT_NETWORK2_RESERVED_RANGE:    {{bat_network2_reserved_range}}
         BAT_NETWORK_GATEWAY:            {{bat_network_gateway}}
         BAT_NETWORK_STATIC_RANGE:       {{bat_network_static_range}}
         BAT_NETWORK_STATIC_IP:          {{bat_network_static_ip}}

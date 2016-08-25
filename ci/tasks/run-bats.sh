@@ -14,7 +14,8 @@ set -e
 : ${BAT_NETWORK1_CIDR:?}
 : ${BAT_NETWORK2_CIDR:?}
 : ${BAT_SECOND_STATIC_IP:?}
-: ${BAT_NETWORK_RESERVED_RANGE:?}
+: ${BAT_NETWORK1_RESERVED_RANGE:?}
+: ${BAT_NETWORK2_RESERVED_RANGE:?}
 : ${BAT_NETWORK_STATIC_RANGE:?}
 : ${BAT_NETWORK_GATEWAY:?}
 : ${BAT_NETWORK_STATIC_IP:?}
@@ -215,7 +216,7 @@ properties:
       subnet_name: ${AZURE_CF_SUBNET1_NAME}
       security_group: ${AZURE_DEFAULT_SECURITY_GROUP}
     cidr: ${BAT_NETWORK1_CIDR}
-    reserved: [${BAT_NETWORK_RESERVED_RANGE}]
+    reserved: [${BAT_NETWORK1_RESERVED_RANGE}]
     static: [${BAT_NETWORK_STATIC_RANGE}]
     gateway: ${BAT_NETWORK_GATEWAY}
   - name: second
@@ -227,7 +228,7 @@ properties:
       subnet_name: ${AZURE_CF_SUBNET2_NAME}
       security_group: ${AZURE_DEFAULT_SECURITY_GROUP}
     cidr: ${BAT_NETWORK2_CIDR}
-    reserved: [${BAT_NETWORK_RESERVED_RANGE}]
+    reserved: [${BAT_NETWORK2_RESERVED_RANGE}]
     static: [${BAT_NETWORK_STATIC_RANGE}]
     gateway: ${BAT_NETWORK_GATEWAY}
   - name: static
