@@ -23,32 +23,60 @@
         "description": "the CIDR block of the azure virtual network"
       }
     },
-    "subnetNameForBosh": {
+    "subnet1NameForBosh": {
       "type": "string",
-      "defaultValue": "BOSH",
+      "defaultValue": "BOSH1",
       "metadata": {
-        "description": "name of the subnet for Bosh"
+        "description": "name of the first subnet for Bosh"
       }
     },
-    "boshSubnetPrefix": {
+    "subnet2NameForBosh": {
+      "type": "string",
+      "defaultValue": "BOSH2",
+      "metadata": {
+        "description": "name of the second subnet for Bosh"
+      }
+    },
+    "boshSubnet1Prefix": {
       "type": "string",
       "defaultValue": "10.0.0.0/24",
       "metadata": {
-        "description": "the CIDR block of the subnet for Bosh"
+        "description": "the CIDR block of the first subnet for Bosh"
       }
     },
-    "subnetNameForCloudFoundry": {
+    "boshSubnet2Prefix": {
       "type": "string",
-      "defaultValue": "CloudFoundry",
+      "defaultValue": "10.0.1.0/24",
       "metadata": {
-        "description": "name of the subnet for CloudFoundy"
+        "description": "the CIDR block of the second subnet for Bosh"
       }
     },
-    "cfSubnetPrefix": {
+    "subnet1NameForCloudFoundry": {
+      "type": "string",
+      "defaultValue": "CloudFoundry1",
+      "metadata": {
+        "description": "name of the first subnet for CloudFoundy"
+      }
+    },
+    "subnet2NameForCloudFoundry": {
+      "type": "string",
+      "defaultValue": "CloudFoundry2",
+      "metadata": {
+        "description": "name of the second subnet for CloudFoundy"
+      }
+    },
+    "cfSubnet1Prefix": {
       "type": "string",
       "defaultValue": "10.0.16.0/24",
       "metadata": {
-        "description": "the CIDR block of the subnet for CloudFoundy"
+        "description": "the CIDR block of the first subnet for CloudFoundy"
+      }
+    },
+    "cfSubnet2Prefix": {
+      "type": "string",
+      "defaultValue": "10.0.17.0/24",
+      "metadata": {
+        "description": "the CIDR block of the second subnet for CloudFoundy"
       }
     }
   },
@@ -138,15 +166,21 @@
         },
         "subnets": [
           {
-            "name": "[parameters('subnetNameForBosh')]",
+            "name": "[parameters('subnet1NameForBosh')]",
             "properties": {
-              "addressPrefix": "[parameters('boshSubnetPrefix')]"
+              "addressPrefix": "[parameters('boshSubnet1Prefix')]"
             }
           },
           {
-            "name": "[parameters('subnetNameForCloudFoundry')]",
+            "name": "[parameters('subnet1NameForCloudFoundry')]",
             "properties": {
-              "addressPrefix": "[parameters('cfSubnetPrefix')]"
+              "addressPrefix": "[parameters('cfSubnet1Prefix')]"
+            }
+          },
+          {
+            "name": "[parameters('subnet2NameForCloudFoundry')]",
+            "properties": {
+              "addressPrefix": "[parameters('cfSubnet2Prefix')]"
             }
           }
         ]
@@ -165,15 +199,21 @@
         },
         "subnets": [
           {
-            "name": "[parameters('subnetNameForBosh')]",
+            "name": "[parameters('subnet1NameForBosh')]",
             "properties": {
-              "addressPrefix": "[parameters('boshSubnetPrefix')]"
+              "addressPrefix": "[parameters('boshSubnet1Prefix')]"
             }
           },
           {
-            "name": "[parameters('subnetNameForCloudFoundry')]",
+            "name": "[parameters('subnet2NameForBosh')]",
             "properties": {
-              "addressPrefix": "[parameters('cfSubnetPrefix')]"
+              "addressPrefix": "[parameters('boshSubnet2Prefix')]"
+            }
+          },
+          {
+            "name": "[parameters('subnet1NameForCloudFoundry')]",
+            "properties": {
+              "addressPrefix": "[parameters('cfSubnet1Prefix')]"
             }
           }
         ]

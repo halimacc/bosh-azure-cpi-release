@@ -10,7 +10,7 @@ set -e
 : ${AZURE_GROUP_NAME_FOR_NETWORK:?}
 : ${AZURE_VNET_NAME_FOR_BATS:?}
 : ${AZURE_STORAGE_ACCOUNT_NAME:?}
-: ${AZURE_BOSH_SUBNET_NAME:?}
+: ${AZURE_BOSH_SUBNET1_NAME:?}
 : ${AZURE_DEFAULT_SECURITY_GROUP:?}
 : ${AZURE_DEBUG_MODE:?}
 : ${SSH_PRIVATE_KEY:?}
@@ -77,7 +77,7 @@ networks:
     cloud_properties:
       resource_group_name: ${AZURE_GROUP_NAME_FOR_NETWORK}
       virtual_network_name: ${AZURE_VNET_NAME_FOR_BATS}
-      subnet_name: ${AZURE_BOSH_SUBNET_NAME}
+      subnet_name: ${AZURE_BOSH_SUBNET1_NAME}
 
 resource_pools:
 - name: vms

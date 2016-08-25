@@ -15,8 +15,10 @@ function exit_if_error {
 : ${AZURE_STORAGE_ACCOUNT_NAME:?}
 : ${AZURE_VNET_NAME_FOR_BATS:?}
 : ${AZURE_VNET_NAME_FOR_LIFECYCLE:?}
-: ${AZURE_BOSH_SUBNET_NAME:?}
-: ${AZURE_CF_SUBNET_NAME:?}
+: ${AZURE_BOSH_SUBNET1_NAME:?}
+: ${AZURE_BOSH_SUBNET2_NAME:?}
+: ${AZURE_CF_SUBNET1_NAME:?}
+: ${AZURE_CF_SUBNET2_NAME:?}
 
 azure login --service-principal -u ${AZURE_CLIENT_ID} -p ${AZURE_CLIENT_SECRET} --tenant ${AZURE_TENANT_ID}
 azure config mode arm
@@ -52,7 +54,7 @@ do
       echo "The task failed because the virtual network ${vnet} does not exist in resource group ${resource_group_name}"
       exit_if_error
     else
-      subnets="${AZURE_BOSH_SUBNET_NAME} ${AZURE_CF_SUBNET_NAME}"
+      subnets="${AZURE_BOSH_SUBNET1_NAME} ${AZURE_BOSH_SUBNET2_NAME} ${AZURE_CF_SUBNET1_NAME} ${AZURE_CF_SUBNET2_NAME}"
       for subnet in ${subnets}
       do
         echo "azure network vnet subnet show --resource-group ${resource_group_name} --vnet-name ${vnet} --name ${subnet} --json | jq '.name' -r"

@@ -7,10 +7,12 @@ set -e
 : ${AZURE_TENANT_ID:?}
 : ${AZURE_GROUP_NAME:?}
 : ${AZURE_VNET_NAME_FOR_BATS:?}
-: ${AZURE_CF_SUBNET_NAME:?}
+: ${AZURE_CF_SUBNET1_NAME:?}
+: ${AZURE_CF_SUBNET2_NAME:?}
 : ${AZURE_DEFAULT_SECURITY_GROUP:?}
 : ${BAT_VCAP_PASSWORD:?}
-: ${BAT_NETWORK_CIDR:?}
+: ${BAT_NETWORK1_CIDR:?}
+: ${BAT_NETWORK2_CIDR:?}
 : ${BAT_SECOND_STATIC_IP:?}
 : ${BAT_NETWORK_RESERVED_RANGE:?}
 : ${BAT_NETWORK_STATIC_RANGE:?}
@@ -210,9 +212,9 @@ properties:
     cloud_properties:
       resource_group_name: ${AZURE_GROUP_NAME}
       virtual_network_name: ${AZURE_VNET_NAME_FOR_BATS}
-      subnet_name: ${AZURE_CF_SUBNET_NAME}
+      subnet_name: ${AZURE_CF_SUBNET1_NAME}
       security_group: ${AZURE_DEFAULT_SECURITY_GROUP}
-    cidr: ${BAT_NETWORK_CIDR}
+    cidr: ${BAT_NETWORK1_CIDR}
     reserved: [${BAT_NETWORK_RESERVED_RANGE}]
     static: [${BAT_NETWORK_STATIC_RANGE}]
     gateway: ${BAT_NETWORK_GATEWAY}
@@ -222,9 +224,9 @@ properties:
     cloud_properties:
       resource_group_name: ${AZURE_GROUP_NAME}
       virtual_network_name: ${AZURE_VNET_NAME_FOR_BATS}
-      subnet_name: ${AZURE_CF_SUBNET_NAME}
+      subnet_name: ${AZURE_CF_SUBNET2_NAME}
       security_group: ${AZURE_DEFAULT_SECURITY_GROUP}
-    cidr: ${BAT_NETWORK_CIDR}
+    cidr: ${BAT_NETWORK2_CIDR}
     reserved: [${BAT_NETWORK_RESERVED_RANGE}]
     static: [${BAT_NETWORK_STATIC_RANGE}]
     gateway: ${BAT_NETWORK_GATEWAY}

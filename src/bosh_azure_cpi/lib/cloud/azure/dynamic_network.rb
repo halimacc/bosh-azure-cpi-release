@@ -30,12 +30,16 @@ module Bosh::AzureCloud
       end
     end
 
+    def dns
+      @spec["dns"]
+    end
+
     def has_default_dns?
-      (!@spec["default"].nil?) && (@spec["default"].include?("dns"))
+      !@spec["default"].nil? && @spec["default"].include?("dns")
     end
 
     def has_default_gateway?
-      (!@spec["default"].nil?) && (@spec["default"].include?("gateway"))
+      !@spec["default"].nil? && @spec["default"].include?("gateway")
     end
   end
 end

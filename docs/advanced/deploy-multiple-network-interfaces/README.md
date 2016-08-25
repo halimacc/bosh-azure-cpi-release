@@ -82,10 +82,9 @@ azure network vnet subnet create --resource-group bosh-res-group --vnet-name bos
         virtual_network_name: boshvnet-crp
         subnet_name: CloudFoundry2
   - name: cf_private3
-    type: manual
+    type: dynamic
     subnets:
     - range: 10.0.41.0/24
-      gateway: 10.0.41.1
       dns: [168.63.129.16, 8.8.8.8]
       reserved: ["10.0.41.2 - 10.0.41.3"]
       static: ["10.0.41.4 - 10.0.41.100"]

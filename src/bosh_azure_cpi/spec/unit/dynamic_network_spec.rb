@@ -8,6 +8,7 @@ describe Bosh::AzureCloud::DynamicNetwork do
     let(:network_spec) {
       {
         "default" => ["dns", "gateway"],
+        "dns" => "8.8.8.8",
         "cloud_properties"=>{
           "virtual_network_name"=>"foo",
           "subnet_name"=>"bar",
@@ -24,6 +25,7 @@ describe Bosh::AzureCloud::DynamicNetwork do
       expect(sn.virtual_network_name).to eq("foo")
       expect(sn.subnet_name).to eq("bar")
       expect(sn.security_group).to eq("fake_sg")
+      expect(sn.dns).to eq("8.8.8.8")
       expect(sn.has_default_dns?).to eq(true)
       expect(sn.has_default_gateway?).to eq(true)
     end
@@ -114,7 +116,7 @@ describe Bosh::AzureCloud::DynamicNetwork do
       end
     end
 
-    context "missing security_group" do
+    context "without security_group" do
       let(:network_spec) {
         {
           "ip" => "fake-ip",
@@ -131,7 +133,7 @@ describe Bosh::AzureCloud::DynamicNetwork do
       end
     end
 
-    context "missing resource_group_name" do
+    context "without resource_group_name" do
       let(:network_spec) {
         {
           "ip" => "fake-ip",
@@ -148,7 +150,7 @@ describe Bosh::AzureCloud::DynamicNetwork do
       end
     end
 
-    context "missing default dns and gateway" do
+    context "without default dns nor gateway" do
       let(:network_spec) {
         {
           "ip" => "fake-ip",
@@ -159,13 +161,10 @@ describe Bosh::AzureCloud::DynamicNetwork do
         }
       }
 
-      it "should return false for #has_default_dns?" do
+      it "should return nil for :dns, return false for :has_default_dns?, return false for :has_default_gateway?" do
         sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
+        expect(sn.dns).to eq(nil)
         expect(sn.has_default_dns?).to eq(false)
-      end
-
-      it "should return false for #has_default_gateway?" do
-        sn = Bosh::AzureCloud::DynamicNetwork.new(azure_properties, "default", network_spec)
         expect(sn.has_default_dns?).to eq(false)
       end
     end

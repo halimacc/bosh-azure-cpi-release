@@ -21,7 +21,8 @@ describe Bosh::AzureCloud::Cloud do
   end
 
   let(:vnet_name)     { ENV.fetch('BOSH_AZURE_VNET_NAME', 'boshvnet-crp') }
-  let(:subnet_name)   { ENV.fetch('BOSH_AZURE_SUBNET_NAME', 'Bosh') }
+  let(:subnet1_name)  { ENV.fetch('BOSH_AZURE_SUBNET1_NAME', 'BOSH1') }
+  let(:subnet2_name)  { ENV.fetch('BOSH_AZURE_SUBNET2_NAME', 'BOSH2') }
   let(:instance_type) { ENV.fetch('BOSH_AZURE_INSTANCE_TYPE', 'Standard_D1') }
   let(:vm_metadata) { { deployment: 'deployment', job: 'cpi_spec', index: '0', delete_me: 'please' } }
   let(:network_spec) { {} }
@@ -74,7 +75,7 @@ describe Bosh::AzureCloud::Cloud do
           'ip' => "10.0.0.#{Random.rand(10..99)}",
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         }
       }
@@ -172,7 +173,7 @@ describe Bosh::AzureCloud::Cloud do
           'type' => 'dynamic',
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         }
       }
@@ -190,7 +191,7 @@ describe Bosh::AzureCloud::Cloud do
           'type' => 'dynamic',
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         },
         'network_b' => {
@@ -214,15 +215,15 @@ describe Bosh::AzureCloud::Cloud do
           'default' => ['dns', 'gateway'],
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         },
         'network_b' => {
           'type' => 'manual',
-          'ip' => "10.0.0.#{Random.rand(10..99)}",
+          'ip' => "10.0.1.#{Random.rand(10..99)}",
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet2_name
           }
         },
         'network_c' => {
@@ -254,7 +255,7 @@ describe Bosh::AzureCloud::Cloud do
           'type' => 'dynamic',
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         }
       }
@@ -298,7 +299,7 @@ describe Bosh::AzureCloud::Cloud do
           'cloud_properties' => {
             'resource_group_name' => @resource_group_name_for_network,
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         }
       }
@@ -316,7 +317,7 @@ describe Bosh::AzureCloud::Cloud do
           'type' => 'dynamic',
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         },
         'network_b' => {
@@ -342,7 +343,7 @@ describe Bosh::AzureCloud::Cloud do
           'ip' => "10.0.0.#{Random.rand(10..99)}",
           'cloud_properties' => {
             'virtual_network_name' => vnet_name,
-            'subnet_name' => subnet_name
+            'subnet_name' => subnet1_name
           }
         }
       }

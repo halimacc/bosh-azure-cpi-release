@@ -686,44 +686,11 @@ module Bosh::AzureCloud
 
     def get_network_interface(url)
       result = get_resource_by_id(url)
-      get_network_interface_from_result(result)
-    end
-
-    def get_network_interface_from_result(result) 
-      interface = nil
-      unless result.nil?
-        interface = {}
-        interface[:id] = result['id']
-        interface[:name] = result['name']
-        interface[:location] = result['location']
-        interface[:tags] = result['tags']
-
-        properties = result['properties']
-        interface[:provisioning_state] = properties['provisioningState']
-        unless properties['dnsSettings']['dnsServers'].nil?
-          interface[:dns_settings] = []
-          properties['dnsSettings']['dnsServers'].each { |dns| interface[:dns_settings].push(dns) }
-        end
-
-        ip_configuration = properties['ipConfigurations'][0]
-        interface[:ip_configuration_id] = ip_configuration['id']
-
-        ip_configuration_properties = ip_configuration['properties']
-        interface[:private_ip] = ip_configuration_properties['privateIPAddress']
-        interface[:private_ip_allocation_method] = ip_configuration_properties['privateIPAllocationMethod']
-        unless ip_configuration_properties['publicIPAddress'].nil?
-          interface[:public_ip] = get_public_ip(ip_configuration_properties['publicIPAddress']['id'])
-        end
-        unless ip_configuration_properties['loadBalancerBackendAddressPools'].nil?
-          names = parse_name_from_id(ip_configuration_properties['loadBalancerBackendAddressPools'][0]['id'])
-          interface[:load_balancer] = get_load_balancer_by_name(names[:resource_name])
-        end
-      end
-      interface
+      parse_network_interface_from_result(result)
     end
 
     # Query network interfaces whose name matches pattern /#{instance_id}/. #{instance_id} stands for a VM, and NICs of that VM are "#{instance_id}-0", "#{instance_id}-1" and so on.
-    # Return array of network interface names.
+    # Return array of network interfaces, however, the network interface here will not contain informations about public ip or load balancer.
     def list_network_interfaces_by_instance_id(instance_id)
       network_interfaces = []
       network_interfaces_url = rest_api_url(REST_API_PROVIDER_NETWORK, REST_API_NETWORK_INTERFACES)
@@ -731,8 +698,8 @@ module Bosh::AzureCloud
       unless results.nil? || results["value"].nil?
         results["value"].each do |network_interface_spec|
           if network_interface_spec["name"].include?(instance_id)
-            network_interface = get_network_interface_from_result(network_interface_spec)
-            network_interfaces.push(network_interface) unless network_interface.nil?
+            network_interface = parse_network_interface_from_result(network_interface_spec, recursive: false)
+            network_interfaces.push(network_interface)
           end
         end
       end
@@ -927,6 +894,39 @@ module Bosh::AzureCloud
     end
 
     private
+
+    def parse_network_interface_from_result(result, recursive: true) 
+      interface = nil
+      unless result.nil?
+        interface = {}
+        interface[:id] = result['id']
+        interface[:name] = result['name']
+        interface[:location] = result['location']
+        interface[:tags] = result['tags']
+
+        properties = result['properties']
+        interface[:provisioning_state] = properties['provisioningState']
+        unless properties['dnsSettings']['dnsServers'].nil?
+          interface[:dns_settings] = []
+          properties['dnsSettings']['dnsServers'].each { |dns| interface[:dns_settings].push(dns) }
+        end
+
+        ip_configuration = properties['ipConfigurations'][0]
+        interface[:ip_configuration_id] = ip_configuration['id']
+
+        ip_configuration_properties = ip_configuration['properties']
+        interface[:private_ip] = ip_configuration_properties['privateIPAddress']
+        interface[:private_ip_allocation_method] = ip_configuration_properties['privateIPAllocationMethod']
+        unless ip_configuration_properties['publicIPAddress'].nil? || (recursive == false)
+          interface[:public_ip] = get_public_ip(ip_configuration_properties['publicIPAddress']['id'])
+        end
+        unless ip_configuration_properties['loadBalancerBackendAddressPools'].nil? || (recursive == false)
+          names = parse_name_from_id(ip_configuration_properties['loadBalancerBackendAddressPools'][0]['id'])
+          interface[:load_balancer] = get_load_balancer_by_name(names[:resource_name])
+        end
+      end
+      interface
+    end
 
     def filter_credential_in_logs(uri)
       if uri.request_uri.include?('/listKeys')

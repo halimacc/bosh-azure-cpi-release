@@ -47,9 +47,8 @@ module Bosh::AzureCloud
             network = ManualNetwork.new(@azure_properties, name, network_spec)
 
           when "vip"
-            network = VipNetwork.new(@azure_properties, name, network_spec)
             cloud_error("More than one vip network for `#{name}'") if @vip_network
-            @vip_network = network
+            @vip_network = VipNetwork.new(@azure_properties, name, network_spec)
 
           else
             cloud_error("Invalid network type `#{network_type}' for Azure, " \
@@ -61,7 +60,7 @@ module Bosh::AzureCloud
         # The network with 'default: ["gateway"]' will be the primary network.
         # For single network, 'default: ["gateway"]' can be ignored, it will automatically picked as primary network.
         #
-        if network_type == "dynamic" || network_type == "manual"
+        unless network.nil?
           if network.has_default_gateway?
             @networks.insert(0, network)
           else
@@ -80,9 +79,9 @@ module Bosh::AzureCloud
     #
     def default_dns
       @networks.each do |network|
-        return network.spec["dns"] if network.has_default_dns?
+        return network.dns if network.has_default_dns?
       end
-      @networks[0].spec["dns"]
+      @networks[0].dns
     end
   end
 end
