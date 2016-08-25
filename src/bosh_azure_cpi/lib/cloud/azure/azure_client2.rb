@@ -124,7 +124,7 @@ module Bosh::AzureCloud
     # * +:vm_size+              - String. Specifies the size of the virtual machine instance.
     # * +:username+             - String. User name for the virtual machine instance.
     # * +:ssh_cert_data+        - String. The content of SSH certificate.
-    # * +:custom_data+          - String. Specifies a base-64 encoded string of custom data. 
+    # * +:custom_data+          - String. Specifies a base-64 encoded string of custom data.
     # * +:image_uri+            - String. The URI of the image.
     # * +:os_disk+              - Hash. OS Disk for the virtual machine instance.
     # *   +:disk_name+          - String. The name of the OS disk.
@@ -633,7 +633,7 @@ module Bosh::AzureCloud
     # * +:location+      - String. The location where the network interface will be created.
     # * +:ipconfig_name+ - String. The name of ipConfigurations for the network interface.
     # * +:private_ip     - String. Private IP address which the network interface will use.
-    # * +:dns_servers    - Array. DNS servers. 
+    # * +:dns_servers    - Array. DNS servers.
     # * +:public_ip      - Hash. The public IP which the network interface is binded to.
     # * +:security_group - Hash. The network security group which the network interface is binded to.
     #
@@ -651,7 +651,7 @@ module Bosh::AzureCloud
             {
               'name'        => nic_params[:ipconfig_name],
               'properties'  => {
-                'privateIPAddress'          => nic_params[:private_ip], 
+                'privateIPAddress'          => nic_params[:private_ip],
                 'privateIPAllocationMethod' => nic_params[:private_ip].nil? ? 'Dynamic' : 'Static',
                 'publicIPAddress'           => nic_params[:public_ip].nil? ? nil : { 'id' => nic_params[:public_ip][:id] },
                 'subnet' => {
@@ -754,7 +754,7 @@ module Bosh::AzureCloud
       end
       nsg
     end
-    
+
     # Storage/StorageAccounts
     # https://msdn.microsoft.com/en-us/library/azure/mt163564.aspx
     def create_storage_account(name, location, account_type, tags)
@@ -895,7 +895,7 @@ module Bosh::AzureCloud
 
     private
 
-    def parse_network_interface_from_result(result, recursive: true) 
+    def parse_network_interface_from_result(result, recursive: true)
       interface = nil
       unless result.nil?
         interface = {}
