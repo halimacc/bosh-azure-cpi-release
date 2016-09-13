@@ -1,6 +1,7 @@
 module Bosh::AzureCloud
   module Helpers
 
+
     AZURE_RESOUCE_PROVIDER_COMPUTER         = 'crp'
     AZURE_RESOUCE_PROVIDER_NETWORK          = 'nrp'
     AZURE_RESOUCE_PROVIDER_STORAGE          = 'srp'
